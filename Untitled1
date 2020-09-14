@@ -1,0 +1,5 @@
+git init  >>>> 1 vez
+git add *
+git commit -m "Alta proyecto"
+git remote add origin https://github.com/Joel-aragon/CursoAnsible.git  >>>> 1 vez
+git push -u origin master
