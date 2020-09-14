@@ -1,0 +1,31 @@
+# Archivo de inventario formato YAML
+# La etiqueta all la ponemos siempre
+
+all:
+    # La marca host permite especificar entornos dentro de un grupo (en este caso all) 
+    host:
+        proxy.curso.es:
+            # Dentro de una maquina puedo definir variables
+            so: freebsd
+    # La marca children permite especificar grupos dentro de otro grupo (en este caso all)
+    children:
+        servidores_aplicaciones:
+            host:
+                weblogic0[0:9].curso.es:
+                so: rhel
+        servidores_bases_de_datos:
+            host:
+                servidores_mysql:
+                    host:
+                        mysql01.prod.curso.es
+                        # so: ubuntu
+                servidores_oracle:
+                    host:
+                        oracle01.pro.curso.es
+                        # so: ubuntu
+            # Lo heredan todas las maquinas dentro del grupo
+            vars:
+                so: ubuntu
+
+            
+# Tanto host como children son opcionales.

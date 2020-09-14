@@ -1,0 +1,15 @@
+# Contra que maquinas trabajamos
+- hosts:
+    # Permite decidir con que usuario conectarse
+    remote_user:
+    # Permite decidir el orden de ejecucion
+    order: inventory | reverse_inventory | sorted | reverse_sorted | suffle
+    # Variales
+    vars:
+    # Listado de tareas a realizar
+    task:
+    # Tareas que se ocurren bajo ciertas condiciones
+    handlers:
+    
+    
+    
