@@ -1,0 +1,81 @@
+- hosts: localhost
+  # Desactivar facts pondriamos false tambien podemos usar " ansible maquina -m setup"
+  gather_facts: true
+  remote_user: root
+  order: inventory 
+  
+  vars:
+    puerto: 8080
+    configuracion:
+      nginx:
+        puerto: 80
+        ssl: false
+      apache:
+        puerto: 
+          # Esto es una lista
+          - 443
+          - 9443
+        ssl: true
+  
+  tasks:
+    - name: 1- Inicialización
+      debug: 
+        msg: Inicialización de nuestro playbook
+    
+    - name: 2- Mostrar variable
+      debug:
+        msg: "Mi variable puerto tiene el valor: {{ puerto }} "
+        
+    - name: 3- Poder generar una doble llave
+      debug:
+        msg: !unsafe "Para generar el valor se usa la sintaxis: {{ puerto }}"
+    
+    - name: 4- Mostrar valor variable
+      debug:
+        msg: "Mi variable puerto tiene el valor: {{ configuracion.apache.puerto }} "
+        
+    - name: 5- Redifinir variable
+      debug:
+        msg: "Mi variable puerto tiene el valor: {{ puerto }} "
+      # Redefinir variables o crear nuevas a nivel de tarea
+      vars:
+        puerto: 9999
+        
+    - name: 6- Mostrar variable de lista
+      debug:
+        msg: "El segundo puerto del apache tiene el valor: {{ configuracion.apache.puerto[1] }} "
+   
+    - name: 7- Mostrar sistema operativo (facts)
+      debug:
+        # el > es para separar una linea to grande
+        msg: >
+          "Sistema Operativo: {{ ansible_facts.distribution }} "
+          "Version: {{ ansible_facts.distribution_version }} "        
+          
+    #### CONDICIONALES      
+    - name: 8- Tarea que se ejecuta en maquinas ubuntus
+      debug:
+        # el > es para separar una linea to grande
+        msg: "esta maquina si es Ubuntu: {{ ansible_facts.distribution }} "
+      when: ansible_facts.distribution == 'Ubuntu'
+      
+    - name: 9- Tarea que se ejecuta en maquinas sombrero rojo
+      debug:
+        # el > es para separar una linea to grande
+        msg: "esta maquina si es Sombrero Rojo: {{ ansible_facts.distribution }} "
+      when: ansible_facts.distribution == 'Redhat'
+      
+    - name: 10- Tarea que se ejecuta en maquinas con version mas grande que 16
+      debug:
+        # el > es para separar una linea to grande
+        msg: "esta maquina es mayor de edad : {{ ansible_facts.distribution_major_version }} "
+      when: ansible_facts.distribution_major_version > "16"
+      
+    - name: 11- Tarea que se ejecuta en maquinas con version mas grande que 16 y Ubuntu
+      debug:
+        # el > es para separar una linea to grande
+        msg: "esta maquina es mayor de edad : {{ ansible_facts.distribution_major_version }} y Ubuntu: {{ ansible_facts.distribution }} "
+     # when: ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version > "16" 
+      when: 
+        - ansible_facts.distribution == 'Ubuntu' 
+        - ansible_facts.distribution_major_version > "16"
