@@ -71,7 +71,7 @@
         msg: "esta maquina es mayor de edad : {{ ansible_facts.distribution_major_version }} "
       when: ansible_facts.distribution_major_version > "16"
       
-    - name: 11- Tarea que se ejecuta en maquinas con version mas grande que 16 y Ubuntu
+    - name: 10_2- Tarea que se ejecuta en maquinas con version mas grande que 16 y Ubuntu
       debug:
         # el > es para separar una linea to grande
         msg: "esta maquina es mayor de edad : {{ ansible_facts.distribution_major_version }} y Ubuntu: {{ ansible_facts.distribution }} "
@@ -79,3 +79,42 @@
       when: 
         - ansible_facts.distribution == 'Ubuntu' 
         - ansible_facts.distribution_major_version > "16"
+        
+    # tarea que despues de ejcutarse, pide a otra tarea que se ejecute con invocacion directa
+    - name: 11- Dispara un handler
+      debug:
+        msg: "Hago mis movidas Y despues invoco Formatear Disco"
+      #Invocacion directa: solo cuando la 11 ha cambiado algo, como debug no cambia nada no se llama el notify
+      notify: Formatear Disco
+      
+    # tarea que despues de ejcutarse, pide a otra tarea que se ejecute con invocacion directa
+    - name: 12- Dispara un handler
+      debug:
+        msg: "Hago mis movidas Y despues invoco Formatear Disco"
+      # Permite determinar que la tarea a cambiado algo
+      # Pondriamos una condicion
+      changed_when: true
+      #Invoca el envento FORMATEAR y todos los handlers sujetos a ello se lanzaran
+      notify: FORMATEAR
+      
+    - name: 12- Dispara un EVENTO
+      debug:
+        msg: "Hago mis movidas Y despues invoco Formatear Disco"
+      # Permite determinar que la tarea a cambiado algo
+      # Pondriamos una condicion
+      changed_when: true
+      #Invocacion directa: solo cuando la 11 ha cambiado algo, como debug SI cambia se llama el notify
+      notify: Formatear Disco
+  
+  # Los HANDLERS solo se lanzan 1 vez y despues de las tareas
+  handlers:
+    - name: Formatear Disco
+      debug:
+        msg: Estoy formateando el disco!!
+      listen: FORMATEAR
+        
+    - name: Post-Formatear Disco
+      debug:
+        msg: Estoy haciendo cosas despues de formatear
+      listen: FORMATEAR
+    
