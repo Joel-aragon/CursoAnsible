@@ -1,0 +1,83 @@
+# Configurar en Nginx
+# Generar un fichero .conf
+# cargar una web de un git
+
+# tareas comprovacion 
+
+
+#maquina 1 -> ubuntu
+- hosts: maquina1
+  remote_user: root
+  vars:
+    nginx_port: 80
+    mensaje_nginx: NGINX
+  tasks:
+    # Actualizar repos
+    - name: Actualizar Repo
+      apt: update_cache=yes
+    
+    # Instalar Nginx
+    - name: Instalar nginx
+      apt: name=nginx state=present
+    
+    # Instalar Curl
+    - name: Instalar curl
+      apt: name=curl state=present 
+    
+    # isntalar git
+    - name: Instalar git
+      apt: name=git state=present
+    
+    - name: Instalar ufw
+      apt: name=ufw state=present
+      
+    - name: Asegurar la ultima version de nginx
+      apt: name=nginx state=latest
+      tags: actualizar
+        
+    - name: Asegurar la ultima version de curl
+      apt: name=curl state=latest
+      tags: actualizar
+       
+    - name: Asegurar la ultima version de git
+      apt: name=git state=latest
+      tags: actualizar
+        
+        ###### Bloque con ivan
+        
+    # Arrancar el servicio nginx
+    - name: Arrancar nginx
+      service: name=nginx state=started
+    
+    # Comprovacion
+    # comprovar puerto : 80
+    - name: Comprobar el puerto
+      wait_for:
+        host: "{{ ansible_hostname }}"
+        port: "{{ nginx_port }}"
+        timeout: 10
+        state: started  
+        delay: 2
+        connect_timeout: 2
+    
+    # comprovar que el servidor devuelve contenido
+    - name: Comprobar que Nginx contesta
+      uri:
+        url: "http://{{ ansible_hostname }}:{{ nginx_port }}"
+        return_content: yes
+        status_code: 200
+        timeout: 10
+      register: conexion
+      failed_when: "'{{ mensaje_nginx }}'  not in conexion.content"
+      
+    - name: Asegurar que el firewall esta abierto
+      ufw:
+        state: enabled
+        policy: deny
+    
+    - name: abrir puerto 80
+      ufw:
+        rule: allow
+        port: "{{ nginx_port }}"
+        proto: tcp
+      

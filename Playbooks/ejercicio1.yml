@@ -93,18 +93,171 @@
         msg: "Hago mis movidas Y despues invoco Formatear Disco"
       # Permite determinar que la tarea a cambiado algo
       # Pondriamos una condicion
-      changed_when: true
+      changed_when: false
       #Invoca el envento FORMATEAR y todos los handlers sujetos a ello se lanzaran
       notify: FORMATEAR
       
-    - name: 12- Dispara un EVENTO
+    - name: 13- Dispara un EVENTO
       debug:
         msg: "Hago mis movidas Y despues invoco Formatear Disco"
       # Permite determinar que la tarea a cambiado algo
       # Pondriamos una condicion
-      changed_when: true
+      changed_when: false
       #Invocacion directa: solo cuando la 11 ha cambiado algo, como debug SI cambia se llama el notify
       notify: Formatear Disco
+      
+################ Control del estado de Tareas
+
+    - name: 14- Crear un fichero con un contenido
+      shell:
+        cmd:  exit 9
+      register: resultado_proceso
+    # almacenar la info del proceso por nuestro modulo
+      # Nos va a dar informacion como:
+      # .rc -> codigo de respuesta
+      # .stdout -> salida estandart
+      # .changed -> indica si ha habido cambios
+      failed_when: resultado_proceso.rc > 10
+      changed_when: resultado_proceso.rc == 0
+  
+    - name: 15- Mostrar info del proceso REGISTRADO
+      debug:
+        msg: "{{ resultado_proceso }}"
+        
+        
+    - name: 16- Asegurar estado puerto 22 no es listen
+      shell:
+        cmd:  netstat -lnt | grep :22
+      register: resultado_puerto
+      changed_when: false
+      #failed_when: "resultado_puerto.stdout is search('.* LISTEN .*')"
+        # search si contiene un patron
+      #failed_when: "resultado_puerto.stdout is match('.* LISTEN .*')"
+        # el match verifica EXACTAMENTE un patron
+      failed_when: "'LISTEN' in resultado_puerto.stdout"
+      ignore_errors: true
+      
+    - name: 17- Se ejecuta si al tarea 16 fallo
+      debug:
+        msg: "la tarea 16 fallo"
+      when: resultado_puerto is failed
+      # Determinar el resultado de una tarea
+        # is failed -> cuando falla
+        # is succeded -> cuando funciona
+        # is changed -> cuando cambia
+        # is skipped -> cuando se salta
+        # Para tareas -> no definidas
+        # is defined -> si existe
+        # is undedfined -> si no existe
+
+######################  BUCLES
+      
+    - name: 18- Listado IP maquina
+      debug:
+        msg: "IP: {{ item }}"
+      loop: "{{ ansible_facts.all_ipv4_addresses }}"
+      
+    - name: 19- Listado CPU maquina
+      debug:
+        msg: "CPUS info: {{ item }}"
+      loop: "{{ ansible_facts.processor }}"
+      loop_control:
+        index_var: numero
+      when: (numero + 1) % 3 == 0
+      
+      
+######################### FILTROS
+# Podemos elejir si el playbook se ejecuta solo las tareas con ciertas tags
+# ansible-playbook <params...> --tags <tags> para las tageadas
+# ansible-playbook <params...> --skip-tags <tags> salvo las tageadas
+
+    - name: Filtro 1- Instalacion
+      debug:
+        msg: "Soy una tarea de instalacion"
+      tags:
+        - instalacion
+    
+    - name: Filtro 2- Actualizacion
+      debug:
+        msg: "Soy una tarea de Actualizacion"
+      tags:
+        - actualizacion
+        
+    - name: Filtro 3- Instalacion y actualizacion
+      debug:
+        msg: "Soy una tarea de instalacion y actualizacion"
+      tags:
+        - instalacion
+        - actualizacion
+        
+###################### Trabajo con bloques  
+
+    - name: Tarea en bloque
+      block:
+        - name: Tarea 1 del bloque
+          debug:
+            msg: "Tarea 1 del bloque"
+        - name: Tarea 2 del bloque
+          debug:
+            msg: "Tarea 2 del bloque"
+        - name: Tarea 3 del bloque
+          debug:
+            msg: "Tarea 3 del bloque"
+      when: ansible_facts.distribution == 'Redhat'
+      ignore_errors: true
+      
+    - name: Tarea en bloque segunda
+      block:
+        - name: Tarea que funciona bien
+          debug:
+            msg: "Funciono bien"
+        - name: Tarea que funciona mal
+          shell:
+            cmd: exit 1
+        - name: Tarea que ya no se ejecuta por aparacer un errorr
+          debug:
+            msg: "No me ejecuto"
+      
+      rescue: 
+        - name: Tarea que se ejecuta por haber aparecido un errorr
+          debug:
+            msg: "Me ejecuto para arreglar el error"
+      always: 
+        - name: Tarea que se ejecuta siempre despues del bloque
+          debug:
+            msg: "Yo soy inevitable"
+        
+        
+###################### Trabajo con Jinjas
+
+    - name: Tarea utilizando plantilla jinja para control de caracteres
+      debug:
+        msg: "el valor del texto es {{ texto | upper | lower | capitalize | title}}"
+      vars:
+        texto: Soy el texto
+        
+    - name: Tarea utilizando plantilla jinja para espacios en blanco
+      debug:
+        msg: "el valor del texto es --{{ texto | trim }}--"
+      vars:
+        texto: "  Soy el texto de la variable  "
+        
+    - name: Tarea utilizando plantilla jinja para listas
+      debug:
+        msg: "Puertos {{ puertos | sort | reverse | list | max}}"
+      vars:
+        puertos: 
+          - 80
+          - 8080
+          - 8443
+          - 9443
+          - 9080
+        
+    - name: ULTIMA TAREA
+      debug:
+        msg: "Hemos acabau"
+        
+
   
   # Los HANDLERS solo se lanzan 1 vez y despues de las tareas
   handlers:
