@@ -1,0 +1,6 @@
+nginx_port: 80
+nginx_web_path: /web
+paquetes:
+  - nginx
+  - curl
+  - git

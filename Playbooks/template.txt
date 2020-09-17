@@ -1,0 +1,18 @@
+este es el fichero de configuracion
+
+puerto={{ puerto }}
+servidor={{ servidor | lower }}
+
+[rutas]
+{% for ruta in rutas %}
+-{{ ruta }}
+{% endfor %}
+
+
+{% if puerto_seguro %}
+ssl=on
+{% endif %}
+
+{% for i in servers | zip(puertos) %}
+{{ i[0] }}={{ i[1] }}
+{% endfor %}

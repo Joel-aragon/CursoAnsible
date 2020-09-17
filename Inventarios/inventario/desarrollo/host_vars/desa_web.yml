@@ -1,0 +1,13 @@
+ansible_host: 172.17.0.2
+nginx_server_name: 172.17.0.2
+nginx_port: 8080
+mensaje_nginx: "Soy el fichero de la web"
+conf_db_info: 
+  - connection_name: CONN1
+    maxActive: 100
+    maxIdle: 30 
+    maxWait: 10000
+    username: joel
+    password: password-secreta
+    driverClassName: jdbc.Oracle.Driver
+    url: jdbc:://serverdb1:1521/ORAXE

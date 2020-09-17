@@ -1,0 +1,5 @@
+- host: all
+  remote_user: root
+  
+  roles:
+    - web-test

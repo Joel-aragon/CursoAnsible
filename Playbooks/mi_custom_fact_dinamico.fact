@@ -1,0 +1,4 @@
+#!/bin/bash
+mi_hostname=$(hostname)
+
+echo "\""$mi_hostname"\""

@@ -1,0 +1,9 @@
+- hosts: desa_web
+  remote_user: root
+  
+  tasks:
+    - include_role:
+        name: conf_db 
+      vars:
+        conf_db_path: /etc/tomcat/conf
+        

@@ -1,0 +1,16 @@
+<Server>
+    {% for db in conf_db_info %}
+    <Context>
+      <Resource name="jdbc/{{ db.connection_name }}" 
+                auth="Container" 
+                type="javax.sql.DataSource"
+                maxActive="{{ db.max_Active }}" 
+                maxIdle="{{ db.maxIdle }}" 
+                maxWait="{{ db.maxWait }}"
+                username="{{ db.username }}"    
+                password="{{ db.password }}"    
+                driverClassName="{{ db.driverClassName }}"
+                url="{{ db.url }}"/>
+    </Context>
+    {%end for%}
+</Server>

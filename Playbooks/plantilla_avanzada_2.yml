@@ -1,0 +1,34 @@
+- hosts: localhost
+  gather_facts: false
+  remote_user: root
+  
+  vars:
+    puerto: 9090
+    servidor: WEB_INTERNA
+    puerto_seguro: off
+    rutas:
+      - /tmp/
+      - /otra/ruta
+      - /otra/ruta/mas
+    letras:
+      - a
+      - b 
+      - c 
+      - d 
+      - e
+    puertos:
+      - 80
+      - 81
+      - 82
+    servers:
+      - server1
+      - server2
+      - server3
+  # las pretareas se ejecutan antes y todos sus handlres se ejecutan
+  tasks:
+    #generar un archivo personalizado en el entorno de destino
+    - template:
+        src: template.txt
+        dest: /tmp/config.txt
+      
+    

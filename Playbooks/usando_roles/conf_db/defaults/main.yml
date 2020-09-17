@@ -1,0 +1,11 @@
+---
+conf_db_path: /path/to/content
+conf_db_info: 
+  - connection_name: connection_name
+    maxActive: 100
+    maxIdle: 30 
+    maxWait: 10000
+    username: username
+    password: password
+    driverClassName: "com.mysql.jdbc.Driver"
+    url: "jdbc:mysql://localhost:3306/javatest"

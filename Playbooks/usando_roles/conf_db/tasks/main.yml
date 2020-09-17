@@ -1,0 +1,12 @@
+---
+- name: Crear directorio 
+  file:
+    path: "{{ conf_db_path }}"
+        state: directory
+
+- name: Generar fichero 
+  template:
+    src: templates/server.xml
+    dest: "{{ conf_db_path }}/server.xml"
+    mode: '0644'
+    

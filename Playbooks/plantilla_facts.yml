@@ -1,0 +1,51 @@
+- hosts: 172.17.0.2
+  gather_facts: true
+  remote_user: root
+  
+  tasks:
+    - name: Crear directorio de CUSTOM FACTS en entorno remoto
+      file:
+        path: /etc/ansible/facts.d
+        state: directory
+      tags:
+        - create_facts
+        
+    - name: Copiar el fichero con el CUSTOM FACT en entorno remoto
+      copy:
+        src: mi_custom_fact.fact
+        dest: /etc/ansible/facts.d/mi_custom_fact.fact
+        mode: '644'
+      tags:
+        - create_facts
+    
+    - name: Copiar el fichero con el CUSTOM FACT en entorno remoto
+      copy:
+        content: '"este es mi valor fact 2"'
+        dest: /etc/ansible/facts.d/mi_custom_fact_2.fact
+        mode: '644'
+      tags:
+        - create_facts
+        
+    - name: Copiar el fichero con el CUSTOM FACT ejecutable en entorno remoto
+      copy:
+        src: mi_custom_fact_dinamico.fact
+        dest: /etc/ansible/facts.d/mi_custom_fact_dinamico.fact
+        mode: '755'
+      tags:
+        - create_facts
+        
+    - name: Copiar el fichero con el CUSTOM FACT ejecutable en python entorno remoto
+      copy:
+        src: mi_custom_fact_dinamico_p.fact
+        dest: /etc/ansible/facts.d/mi_custom_fact_dinamico_p.fact
+        mode: '755'
+      tags:
+        - create_facts
+    
+    - name: Mostrar facts
+      debug: 
+        msg: "{{ ansible_local }}"
+        
+    - name: Mostrar facts
+      debug: 
+        msg: "{{ ansible_local.mi_custom_fact_dinamico }}"

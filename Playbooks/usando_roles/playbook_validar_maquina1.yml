@@ -1,0 +1,15 @@
+- hosts: desa_web
+  remote_user: root
+  
+  #roles:
+  #  - role: web-test
+  #    vars:
+  #      web_test_server_name:  "{{ nginx_server_name }}"
+  #      web_test_message: "{{ nginx_message }}"
+  
+  tasks:
+    - include_role:
+        name: web-test 
+      vars:
+        web_test_server_name:  "{{ nginx_server_name }}"
+        web_test_message: "{{ nginx_message }}"

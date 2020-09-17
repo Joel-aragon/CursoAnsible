@@ -6,47 +6,78 @@
 
 
 #maquina 1 -> ubuntu
-- hosts: maquina1
+- hosts: desa_web
   remote_user: root
+  
   vars:
     nginx_port: 80
-    mensaje_nginx: NGINX
+    nginx_web_path: /www
+    
   tasks:
     # Actualizar repos
     - name: Actualizar Repo
       apt: update_cache=yes
     
-    # Instalar Nginx
-    - name: Instalar nginx
-      apt: name=nginx state=present
+    # Instalar Paquetes
+    - name: Instalar Paquetes 
+      apt: "name={{ item }} state=present"
+      loop: "{{ paquetes }}"
+      
+   # - name: Instalar nginx
+    #  apt: name=nginx state=present
     
     # Instalar Curl
-    - name: Instalar curl
-      apt: name=curl state=present 
+   # - name: Instalar curl
+   #   apt: name=curl state=present 
     
-    # isntalar git
-    - name: Instalar git
-      apt: name=git state=present
+   # # isntalar git
+   # - name: Instalar git
+   #   apt: name=git state=present
     
-    - name: Instalar ufw
-      apt: name=ufw state=present
+   # - name: Instalar ufw
+   #   apt: name=ufw state=present
+    - name: Asegurar nginx parado
+      service: name=nginx state=stopped
+      tags:
+        - actualizar
+        - nginx
+      register: nginx_parado
       
     - name: Asegurar la ultima version de nginx
       apt: name=nginx state=latest
-      tags: actualizar
+      tags: 
+        - actualizar
         
     - name: Asegurar la ultima version de curl
       apt: name=curl state=latest
-      tags: actualizar
+      tags: 
+        - actualizar
        
     - name: Asegurar la ultima version de git
       apt: name=git state=latest
-      tags: actualizar
+      tags: 
+        - actualizar
         
         ###### Bloque con ivan
+    - name: Generar fichero conf
+      template:
+        src: Config.template
+        dest: /etc/nginx/conf.d/mi_web.conf
+        mode: '0400'
+      register: configuracion
+        
+    - name: Clonar la web
+      git:
+        repo: https://github.com/IvanciniGT/webEjemploAnsible
+        dest: /web
+        
         
     # Arrancar el servicio nginx
-    - name: Arrancar nginx
+    - name: Reiniciar nginx si hace falta
+      service: name=nginx state=restarted
+      when: configuracion is changed or nginx_parado is defined
+      
+    - name: Asegurar que nginx este arrancado
       service: name=nginx state=started
     
     # Comprovacion
@@ -63,21 +94,27 @@
     # comprovar que el servidor devuelve contenido
     - name: Comprobar que Nginx contesta
       uri:
-        url: "http://{{ ansible_hostname }}:{{ nginx_port }}"
+        url: "http://{{ nginx_server_name }}:{{ nginx_port }}"
         return_content: yes
         status_code: 200
         timeout: 10
       register: conexion
-      failed_when: "'{{ mensaje_nginx }}'  not in conexion.content"
+      failed_when: mensaje_nginx not in conexion.content
       
-    - name: Asegurar que el firewall esta abierto
-      ufw:
-        state: enabled
-        policy: deny
+ # handlers:
+  #  - name: Arrancar nginx
+ #     service: name=nginx state=restarted
+   #   listen: configuracion_cambiada
+      
+   # - name: Asegurar que el firewall esta abierto
+   #   ufw:
+  #    state: enabled
+    #    policy: deny
     
-    - name: abrir puerto 80
-      ufw:
-        rule: allow
-        port: "{{ nginx_port }}"
-        proto: tcp
+    #- name: abrir puerto 80
+    #  ufw:
+    #    rule: allow
+    #    port: "{{ nginx_port }}"
+    #    proto: tcp
+    
       

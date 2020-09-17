@@ -1,0 +1,21 @@
+- name: Asegurar nginx parado
+      service: name=nginx state=stopped
+      tags:
+        - actualizar
+        - nginx
+      register: nginx_parado
+      
+    - name: Asegurar la ultima version de nginx
+      apt: name=nginx state=latest
+      tags: 
+        - actualizar
+        
+    - name: Asegurar la ultima version de curl
+      apt: name=curl state=latest
+      tags: 
+        - actualizar
+       
+    - name: Asegurar la ultima version de git
+      apt: name=git state=latest
+      tags: 
+        - actualizar

@@ -1,0 +1,8 @@
+# Actualizar repos
+- name: Actualizar Repo
+   apt: update_cache=yes
+    
+# Instalar Paquetes
+- name: Instalar Paquetes 
+  apt: "name={{ item }} state=present"
+  loop: "{{ paquetes }}"

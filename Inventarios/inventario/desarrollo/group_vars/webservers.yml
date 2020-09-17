@@ -1,0 +1,8 @@
+nginx_port: 80
+nginx_server_name: 172.17.0.2
+nginx_message: "fichero"
+nginx_web_path: /web
+paquetes:
+  - nginx
+  - curl
+  - git

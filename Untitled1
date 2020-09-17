@@ -3,3 +3,28 @@ git add *
 git commit -m "Alta proyecto"
 git remote add origin https://github.com/Joel-aragon/CursoAnsible.git  >>>> 1 vez
 git push -u origin master
+
+
+
+
+
+ROL: Generar en un entorno remoto carpeta con varios archivos de conf BD
+    RUTA->
+    NOMBRE-> server.xml
+
+<Server>
+    <Context>
+      <Resource name="jdbc/NOMBRE_CONEXION" 
+                auth="Container" 
+                type="javax.sql.DataSource"
+                
+                maxActive="100" 
+                maxIdle="30" 
+                maxWait="10000"
+                username="javauser"    <----
+                password="javadude"    <----
+                driverClassName="com.mysql.jdbc.Driver"
+                url=" ---- jdbc:mysql://localhost:3306/javatest    ---- "/>
+    </Context>
+    ...
+<Server>

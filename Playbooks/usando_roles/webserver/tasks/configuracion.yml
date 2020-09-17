@@ -1,0 +1,11 @@
+- name: Generar fichero conf
+  template:
+    src: templates/Config.template
+    dest: /etc/nginx/conf.d/mi_web.conf
+    mode: '0400'
+    register: configuracion
+        
+- name: Clonar la web
+  git:
+    repo: "{{ nginx_web_repo }}"
+    dest: "{{ nginx_web_path }}"

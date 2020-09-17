@@ -1,0 +1,67 @@
+- hosts: localhost
+  gather_facts: false
+  remote_user: root
+  
+  # las pretareas se ejecutan antes y todos sus handlres se ejecutan
+  pre_tasks:
+    - debug:
+        msg: Esta es la primera pre-tarea
+      notify: Handler pre-tarea 1
+      changed_when: true
+  # loa roles se ejecutan aqui, pero sus hnadlers se ejeuctan al final
+  # roles: <- deshuso, limita el orden
+  #  - role1:
+ 
+  tasks:
+    - debug:
+        msg: Esta es la primera tarea
+      notify: Handler tarea 1
+      changed_when: true
+    
+    #- include_role:
+    #  name: instalacion
+      
+    - debug:
+        msg: Esta es la segunda tarea
+      notify: Handler tarea 2
+      changed_when: true
+    
+    # fuerza a los handlers que se han registrado a ejecutarse
+    - meta: flush_handlers
+    
+    - debug:
+        msg: Esta es la tercera tarea
+      notify: Handler tarea 3
+      changed_when: true
+      
+    - debug:
+        msg: Tarea final
+        
+  # las post-tareas se ejecutan despues y todos sus handlres se ejecutan al final
+  post_tasks:
+    - debug:
+        msg: Esta es la primera post-tarea
+      notify: Handler post-tarea 1
+      changed_when: true
+        
+  
+  handlers:
+    - name: Handler tarea 1
+      debug: 
+        msg: Soy el handler de la tarea 1
+        
+    - name: Handler tarea 2
+      debug: 
+        msg: Soy el handler de la tarea 2
+        
+    - name: Handler tarea 3
+      debug: 
+        msg: Soy el handler de la tarea 3
+        
+    - name: Handler pre-tarea 1
+      debug: 
+        msg: Soy el handler de la pre-tarea 1
+        
+    - name: Handler post-tarea 1
+      debug: 
+        msg: Soy el handler de la post-tarea 1
